@@ -14,8 +14,6 @@ func main() {
 	router.GET("/books", handlers.GetBooks)
 	router.GET("/books/:id", handlers.GetBookByID)
 	router.POST("/books", handlers.CreateBook)
-	router.PATCH("/checkout", handlers.CheckoutBook)
-	router.PATCH("/return", handlers.ReturnBook)
 
 	router.Run("localhost:8050")
 }

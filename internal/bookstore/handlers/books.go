@@ -13,7 +13,7 @@ import (
 
 func GetBooks(c *gin.Context) {
 	queries := store.New(database.DB)
-	books, err := queries.GetBooks(context.Background())
+	books, err := queries.GetAllBooks(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -50,36 +50,4 @@ func CreateBook(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, book)
-}
-
-func CheckoutBook(c *gin.Context) {
-	id := c.Query("id")
-	val, err := strconv.Atoi(id)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-	queries := store.New(database.DB)
-	err = queries.CheckoutBook(context.Background(), int64(val))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Book not available or not found"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Book checked out successfully"})
-}
-
-func ReturnBook(c *gin.Context) {
-	id := c.Query("id")
-	val, err := strconv.Atoi(id)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-	queries := store.New(database.DB)
-	err = queries.ReturnBook(context.Background(), int64(val))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Book not found"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Book returned successfully"})
 }

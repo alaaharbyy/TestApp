@@ -1,7 +1,7 @@
 version: "2"
 sql:
-  - schema: "./migrations/001_schema.up.sql"  # Path to your schema definition (if any)
-    queries: "internal/bookstore/store/queries.sql"
+  - schema: "./internal/bookstore/store/schema/schema.sql" # Path to your schema definition (if any)
+    queries: "internal/bookstore/store/queries"
     engine: "postgresql"
     gen:
       go:
@@ -13,7 +13,7 @@ sql:
         emit_empty_slices: false
         overrides:
           - db_type: "varchar"
-            go_type: 
+            go_type:
               import: "github.com/jackc/pgx/v5/pgtype"
               type: "Text"
           - db_type: "timestamptz"
@@ -23,11 +23,10 @@ sql:
           - db_type: "date"
             go_type: "time.Time"
           - db_type: "bool"
-            go_type: 
+            go_type:
               import: "github.com/jackc/pgx/v5/pgtype"
               type: "Bool"
           - db_type: "int"
-            go_type: 
+            go_type:
               import: "github.com/jackc/pgx/v5/pgtype"
               type: "Int8"
-
