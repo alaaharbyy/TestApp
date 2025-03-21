@@ -1,0 +1,146 @@
+package geojson
+
+import (
+	"aqary_backend/internal/domain/sqlc/sqlc"
+	"encoding/json"
+	"fmt"
+	"os"
+	"time"
+)
+
+type GeoJSONFeature struct {
+	Type     string `json:"type"`
+	Geometry struct {
+		Type        string    `json:"type"`
+		Coordinates []float64 `json:"coordinates"`
+	} `json:"geometry"`
+	Properties struct {
+		ID                  int64     `json:"id"`
+		CompanyID           int64     `json:"company_id"`
+		PropertyTypeID      int64     `json:"property_type_id"`
+		UnitTypeID          []int64   `json:"unit_type_id"`
+		PropertyTitle       string    `json:"property_title"`
+		PropertyTitleArabic string    `json:"property_title_arabic"`
+		IsVerified          bool      `json:"is_verified"`
+		PropertyRank        int64     `json:"property_rank"`
+		AddressesID         int64     `json:"addresses_id"`
+		EntityTypeID        int64     `json:"entity_type_id"`
+		EntityID            int64     `json:"entity_id"`
+		Status              int64     `json:"status"`
+		IsShowOwnerInfo     bool      `json:"is_show_owner_info"`
+		PropertyName        string    `json:"property_name"`
+		Description         string    `json:"description"`
+		DescriptionArabic   string    `json:"description_arabic"`
+		OwnerUsersID        int64     `json:"owner_users_id"`
+		UserID              int64     `json:"user_id"`
+		UpdatedBy           int64     `json:"updated_by"`
+		FromXml             bool      `json:"from_xml"`
+		Notes               string    `json:"notes"`
+		CreatedAt           time.Time `json:"created_at"`
+		UpdatedAt           time.Time `json:"updated_at"`
+		NotesAr             string    `json:"notes_ar"`
+		IsPublicNote        bool      `json:"is_public_note"`
+		IsProjectProperty   bool      `json:"is_project_property"`
+		Exclusive           bool      `json:"exclusive"`
+		StartDate           time.Time `json:"start_date"`
+		EndDate             time.Time `json:"end_date"`
+
+		// facts
+		Bedroom         string    `json:"bedroom"`
+		Bathroom        int64     `json:"bathroom"`
+		PlotArea        float64   `json:"plot_area"`
+		BuiltUpArea     float64   `json:"built_up_area"`
+		Views           []int64   `json:"views"`
+		Furnished       int64     `json:"furnished"`
+		CompletionDate  time.Time `json:"completion_date"`
+		HandoverDate    time.Time `json:"handover_date"`
+		NoOfFloor       int64     `json:"no_of_floor"`
+		NoOfUnits       int64     `json:"no_of_units"`
+		MinArea         float64   `json:"min_area"`
+		MaxArea         float64   `json:"max_area"`
+		Parking         int64     `json:"parking"`
+		AskPrice        bool      `json:"ask_price"`
+		NoOfRetail      int64     `json:"no_of_retail"`
+		NoOfPool        int64     `json:"no_of_pool"`
+		Elevator        int64     `json:"elevator"`
+		StartingPrice   int64     `json:"starting_price"`
+		LifeStyle       int64     `json:"life_style"`
+		CommercialTax   float64   `json:"commercial_tax"`
+		MunicipalityTax float64   `json:"municipality_tax"`
+		UnitOfMeasure   string    `json:"unit_of_measure"`
+		//completion facts
+		CompletionPercentage     float64   `json:"completion_percentage"`
+		CompletionPercentageDate time.Time `json:"completion_percentage_date"`
+		//property Details
+		SectorNo   int64 `json:"sector_no"`
+		PlotNo     int64 `json:"plot_no"`
+		PropertyNo int64 `json:"property_no"`
+		// for versions
+		Price            float64 `json:"price"`
+		RentType         int64   `json:"rent_type"`
+		NoOfPayment      int64   `json:"no_of_payment"`
+		CompletionStatus int64   `json:"completion_status"`
+		Ownership        int64   `json:"ownership"`
+		ServiceCharge    int64   `json:"service_charge"`
+		SCCurrencyID     int64   `json:"currency_id"`
+		// investment
+		Investment bool `json:"investment"`
+		// ROI
+		IsROI          bool      `json:"roi"`
+		ROIStartDate   time.Time `json:"roi_start_date"`
+		ROIEndDate     time.Time `json:"roi_end_date"`
+		Amount         float64   `json:"amount"`
+		ContractAmount float64   `json:"contract_amount"`
+		// Exclusive
+		ExclusiveStateDate time.Time `json:"exclusive_state_date"`
+		ExclusiveEndDate   time.Time `json:"exclusive_end_date"`
+
+		BookNow          bool      `json:"book_now"`
+		BookingStateDate time.Time `json:"book_now_start_date"`
+		BookingEndDate   time.Time `json:"book_now_end_date"`
+	} `json:"properties"`
+}
+
+type GeoJSONFeatureCollection struct {
+	Type     string           `json:"type"`
+	Features []GeoJSONFeature `json:"features"`
+}
+
+func ConvertPropertiesToGeoJSON(properties []sqlc.Property, filename string) error {
+	var features []GeoJSONFeature
+
+	for _, prop := range properties {
+		feature := GeoJSONFeature{
+			Type: "Feature",
+		}
+		// feature.Geometry.Type = "Point"
+		// feature.Geometry.Coordinates = []float64{prop.Longitude, prop.Latitude}
+		// feature.Properties.Title = prop.Title
+		// feature.Properties.Description = prop.Description
+		// feature.Properties.Marker = "rail-metro"
+		// feature.Properties.URL = prop.URL
+		// feature.Properties.Lines = prop.Lines
+		// feature.Properties.Address = prop.Address
+
+		features = append(features, feature)
+	}
+
+	geoJSON := GeoJSONFeatureCollection{
+		Type:     "FeatureCollection",
+		Features: features,
+	}
+
+	file, err := os.Create(filename)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(geoJSON); err != nil {
+		return fmt.Errorf("failed to encode JSON: %w", err)
+	}
+
+	return nil
+}
